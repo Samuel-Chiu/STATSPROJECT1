@@ -1,0 +1,42 @@
+---
+title: "Data Scraping with rvest"
+author: "Math 271"
+date: "Spring 22"
+output:
+  html_document:
+    css: lab.css
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(magrittr)
+library(rvest)
+
+library(lubridate)
+```
+
+
+```{r}
+raw_html <- read_html("https://waterdata.usgs.gov/or/nwis/current/?type=dailydischarge&group_key=county_cd")
+
+```
+
+
+
+```{r}
+
+url <- "https://waterdata.usgs.gov/or/nwis/current/?type=dailydischarge&group_key=county_cd"
+
+# Read the HTML content of the webpage
+webpage <- read_html(url)
+
+# Use html_nodes to select the table based on HTML tags
+table <- html_nodes(webpage, "table")
+
+# Convert the table to a data frame
+table_df <- html_table(table)[[2]]
+
+
+```
