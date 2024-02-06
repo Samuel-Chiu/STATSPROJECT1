@@ -24,11 +24,6 @@ raw_html <- read_html("https://waterdata.usgs.gov/or/nwis/current/?type=dailydis
 ```
 
 
-```{r, include = FALSE}
-#table_frame = raw_html %>% html_nodes(webpage, "table") %>%  html_table[[2]] 
-
-
-```
 
 ```{r}
 
