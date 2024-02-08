@@ -45,14 +45,6 @@ table_df <- html_table(table)[[2]]
 ```
 
 
-```{r}
-stream <- table_df
-```
-
-```{r}
-stream %>% 
-  stream[!is.na(df$), ]
-```
 
 
 
