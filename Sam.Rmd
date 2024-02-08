@@ -42,6 +42,40 @@ table_df <- html_table(table)[[2]]
 ```
 
 
+```{r}
+
+# Remove characters from numerical data
+clean_column <- function(x) {
+  # Use gsub to remove non-numeric characters
+  x <- gsub("[^0-9.-]", "", x)
+  # Convert cleaned values to numeric
+  x <- as.numeric(x)
+  return(x)
+}
+
+df_cleaned <- table_df %>% 
+  as.data.frame(lapply(table_df, clean_column))
+
+df_cleaned <- table_df[table_df$StationNumber <= "chr"]
+
+```
+df_cleaned <- na.omit(df_cleaned)
+```
+
+```{r}
+
+remove_names <- table_df %>% 
+  select(-"Station name")
+
+```
+
+
+```{r}
+ggplot(datea = remove_names, aes(x = "Dailymeanstream- flow (ft3/s)2/5")) +
+  
+
+```
+
 
 
 
