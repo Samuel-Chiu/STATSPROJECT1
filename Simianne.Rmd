@@ -37,6 +37,6 @@ table <- html_nodes(webpage, "table")
 
 # Convert the table to a data frame
 table_df <- html_table(table)[[2]]
-
-
 ```
+
+
