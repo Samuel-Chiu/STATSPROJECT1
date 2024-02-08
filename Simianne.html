@@ -371,7 +371,8 @@ table &lt;- html_nodes(webpage, &quot;table&quot;)
 # Convert the table to a data frame
 stream &lt;- html_table(table)[[2]]</code></pre>
 <pre class="r"><code>cleaned_data &lt;- stream %&gt;% 
-    rename(&quot;ID&quot; = &quot;StationNumber&quot;, &quot;Name&quot; = &quot;Station name&quot;)</code></pre>
+    rename(&quot;ID&quot; = &quot;StationNumber&quot;, &quot;Name&quot; = &quot;Station name&quot;) %&gt;% 
+  filter(!grepl(&quot;[a-zA-Z]&quot;, ID))</code></pre>
 
 
 

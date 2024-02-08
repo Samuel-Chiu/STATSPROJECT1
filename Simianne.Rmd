@@ -46,7 +46,8 @@ stream <- html_table(table)[[2]]
 
 ```{r}
 cleaned_data <- stream %>% 
-    rename("ID" = "StationNumber", "Name" = "Station name")
+    rename("ID" = "StationNumber", "Name" = "Station name") %>% 
+  filter(!grepl("[a-zA-Z]", ID))
   
 ```
 
