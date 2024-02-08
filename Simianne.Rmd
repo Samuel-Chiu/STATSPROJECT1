@@ -46,5 +46,3 @@ table_df <- html_table(table)[[2]]
 
 
 
-
-
