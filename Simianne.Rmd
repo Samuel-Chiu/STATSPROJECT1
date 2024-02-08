@@ -41,8 +41,25 @@ webpage <- read_html(url)
 table <- html_nodes(webpage, "table")
 
 # Convert the table to a data frame
-table_df <- html_table(table)[[2]]
+stream <- html_table(table)[[2]]
 ```
+
+```{r}
+cleaned_data <- stream %>% 
+    rename("ID" = "StationNumber", "Name" = "Station name")
+  
+```
+
+
+
+
+
+
+
+
+
+
+
 
 
 

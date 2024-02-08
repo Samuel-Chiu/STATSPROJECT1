@@ -369,7 +369,9 @@ webpage &lt;- read_html(url)
 table &lt;- html_nodes(webpage, &quot;table&quot;)
 
 # Convert the table to a data frame
-table_df &lt;- html_table(table)[[2]]</code></pre>
+stream &lt;- html_table(table)[[2]]</code></pre>
+<pre class="r"><code>cleaned_data &lt;- stream %&gt;% 
+    rename(&quot;ID&quot; = &quot;StationNumber&quot;, &quot;Name&quot; = &quot;Station name&quot;)</code></pre>
 
 
 
