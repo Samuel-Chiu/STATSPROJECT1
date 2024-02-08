@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(magrittr)
 library(rvest)
-
+library(ggplot2)
 library(lubridate)
 ```
 
@@ -24,8 +24,8 @@ raw_html <- read_html("https://waterdata.usgs.gov/or/nwis/current/?type=dailydis
 ```
 
 
-
 ```{r}
+
 
 url <- "https://waterdata.usgs.gov/or/nwis/current/?type=dailydischarge&group_key=county_cd"
 
@@ -36,47 +36,83 @@ webpage <- read_html(url)
 table <- html_nodes(webpage, "table")
 
 # Convert the table to a data frame
-table_df <- html_table(table)[[2]]
-
-
-```
-
-
-```{r}
-
-# Remove characters from numerical data
-clean_column <- function(x) {
-  # Use gsub to remove non-numeric characters
-  x <- gsub("[^0-9.-]", "", x)
-  # Convert cleaned values to numeric
-  x <- as.numeric(x)
-  return(x)
-}
-
-df_cleaned <- table_df %>% 
-  as.data.frame(lapply(table_df, clean_column))
-
-df_cleaned <- table_df[table_df$StationNumber <= "chr"]
-
-```
-df_cleaned <- na.omit(df_cleaned)
+stream <- html_table(table)[[2]]
 ```
 
 ```{r}
+cleaned_data <- stream %>% 
+    rename("ID" = "StationNumber", "Name" = "Station name", flow_feb6 = "Dailymeanstream- flow (ft3/s)2/6", flow_feb7 = "Dailymeanstream- flow (ft3/s)2/7", "Difference" = "Change(ft3/s)") %>% 
+  filter(!grepl("[a-zA-Z]", ID)) %>% 
+  filter_all(all_vars(. != "--"))
 
-remove_names <- table_df %>% 
-  select(-"Station name")
+cleaned_data$flow_feb6 <- as.numeric(cleaned_data$flow_feb6)
 
-```
+cleaned_data <- cleaned_data[!is.na(cleaned_data$flow_feb6), ]
 
 
-```{r}
-ggplot(datea = remove_names, aes(x = "Dailymeanstream- flow (ft3/s)2/5")) +
+cleaned_data$flow_feb7 <- as.numeric(cleaned_data$flow_feb7)
+
+cleaned_data <- cleaned_data[!is.na(cleaned_data$flow_feb7), ]
+
+
+cleaned_data$Difference <- as.numeric(cleaned_data$Difference)
+
+cleaned_data <- cleaned_data[!is.na(cleaned_data$Difference), ]
+
+
+log <- cleaned_data %>%
+  mutate(log_sixth =log(flow_feb6, 10)) %>%
+  mutate(log_seventh = log(flow_feb7, 10)) %>%
+  mutate(dif = log(Difference, 10))
+
   
+```
+
+```{r}
+ggplot(data = cleaned_data, aes(x = flow_feb6)) +
+  geom_histogram(binwidth = 25, fill = "skyblue", color = "black") +
+  labs(title = "Histogram of Flow Data", x = "Flow Feb6", y = "Frequency") 
+
+ggplot(data = cleaned_data, aes(x = flow_feb7)) +
+  geom_histogram(binwidth = 25, fill = "skyblue", color = "black") +
+  labs(title = "Histogram of Flow Data", x = "Flow Feb6", y = "Frequency")
+
+
+ggplot(data = cleaned_data, aes(x = Difference))+
+  geom_histogram(binwidth = 5, fill = "skyblue", color = "black") +
+  labs(title = "Histogram of Flow Data", x = "Flow Feb6", y = "Frequency")
+
+
+
+
+
+ggplot(data = log, aes(x = log_sixth)) +
+  geom_histogram(binwidth = .25, fill = "skyblue", color = "black") +
+  labs(title = "Histogram of Flow Data", x = "Flow Feb6", y = "Frequency")
+
+ggplot(data = log, aes(x = log_seventh)) +
+  geom_histogram(binwidth = .25, fill = "skyblue", color = "black") +
+  labs(title = "Histogram of Flow Data", x = "Flow Feb6", y = "Frequency")
+
+
+ggplot(data = log, aes(x = dif))+
+  geom_histogram(binwidth = .25, fill = "skyblue", color = "black") +
+  labs(title = "Histogram of Flow Data", x = "Flow Feb6", y = "Frequency")
 
 ```
 
 
+```{r}
 
+shapiro.test(log$flow_feb6)
+
+shapiro.test(log$flow_feb7)
+
+shapiro.test(log$log_sixth)
+
+shapiro.test(log$log_seventh)
+
+
+```
 
 
