@@ -17,6 +17,11 @@ library(rvest)
 library(lubridate)
 ```
 
+```{r}
+library(dplyr)
+library(tidyverse)
+```
+
 
 ```{r}
 raw_html <- read_html("https://waterdata.usgs.gov/or/nwis/current/?type=dailydischarge&group_key=county_cd")
@@ -38,5 +43,16 @@ table <- html_nodes(webpage, "table")
 # Convert the table to a data frame
 table_df <- html_table(table)[[2]]
 ```
+
+
+```{r}
+stream <- table_df
+```
+
+```{r}
+stream %>% 
+  stream[!is.na(df$), ]
+```
+
 
 
