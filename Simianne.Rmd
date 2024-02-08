@@ -46,7 +46,7 @@ stream <- html_table(table)[[2]]
 
 ```{r}
 cleaned_data <- stream %>% 
-    rename("ID" = "StationNumber", "Name" = "Station name") %>% 
+    rename("ID" = "StationNumber", "Name" = "Station name", "Stream Flow (ft³/s) (2/6)" = "Dailymeanstream- flow (ft3/s)2/6", "Stream Flow (ft³/s) (2/7)" = "Dailymeanstream- flow (ft3/s)2/7", "Difference" = "Change(ft3/s)") %>% 
   filter(!grepl("[a-zA-Z]", ID))
   
 ```

@@ -371,7 +371,7 @@ table &lt;- html_nodes(webpage, &quot;table&quot;)
 # Convert the table to a data frame
 stream &lt;- html_table(table)[[2]]</code></pre>
 <pre class="r"><code>cleaned_data &lt;- stream %&gt;% 
-    rename(&quot;ID&quot; = &quot;StationNumber&quot;, &quot;Name&quot; = &quot;Station name&quot;) %&gt;% 
+    rename(&quot;ID&quot; = &quot;StationNumber&quot;, &quot;Name&quot; = &quot;Station name&quot;, &quot;Stream Flow (ft³/s) (2/6)&quot; = &quot;Dailymeanstream- flow (ft3/s)2/6&quot;, &quot;Stream Flow (ft³/s) (2/7)&quot; = &quot;Dailymeanstream- flow (ft3/s)2/7&quot;, &quot;Difference&quot; = &quot;Change(ft3/s)&quot;) %&gt;% 
   filter(!grepl(&quot;[a-zA-Z]&quot;, ID))</code></pre>
 
 
