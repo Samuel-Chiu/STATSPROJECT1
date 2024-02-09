@@ -1,0 +1,188 @@
+---
+title: "Web Scrape Presentation"
+author: "Samuel Chiu"
+date: "2024-02-08"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(magrittr)
+library(rvest)
+library(ggplot2)
+library(lubridate)
+```
+
+
+```{r, include= FALSE}
+raw_html <- read_html("https://waterdata.usgs.gov/or/nwis/current/?type=dailydischarge&group_key=county_cd")
+
+```
+
+
+```{r, include= FALSE}
+
+
+url <- "https://waterdata.usgs.gov/or/nwis/current/?type=dailydischarge&group_key=county_cd"
+
+# Read the HTML content of the webpage
+webpage <- read_html(url)
+
+# Use html_nodes to select the table based on HTML tags
+table <- html_nodes(webpage, "table")
+
+# Convert the table to a data frame
+stream <- html_table(table)[[2]]
+```
+
+```{r, include = FALSE}
+cleaned_data <- stream %>% 
+    rename("ID" = "StationNumber", "Name" = "Station name", flow_feb6 = "Dailymeanstream- flow (ft3/s)2/6", flow_feb7 = "Dailymeanstream- flow (ft3/s)2/7", "Difference" = "Change(ft3/s)") %>% 
+  filter(!grepl("[a-zA-Z]", ID)) %>% 
+  filter_all(all_vars(. != "--"))
+
+cleaned_data$flow_feb6 <- as.numeric(cleaned_data$flow_feb6)
+
+cleaned_data <- cleaned_data[!is.na(cleaned_data$flow_feb6), ]
+
+
+cleaned_data$flow_feb7 <- as.numeric(cleaned_data$flow_feb7)
+
+cleaned_data <- cleaned_data[!is.na(cleaned_data$flow_feb7), ]
+
+
+cleaned_data$Difference <- as.numeric(cleaned_data$Difference)
+
+cleaned_data <- cleaned_data[!is.na(cleaned_data$Difference), ]
+
+
+log <- cleaned_data %>%
+  mutate(log_sixth =log(flow_feb6, 10)) %>%
+  mutate(log_seventh = log(flow_feb7, 10)) %>%
+  mutate(dif = log(Difference, 10))
+
+  
+```
+## Our Data:
+
+- Our data comes from the United States Geological Service.
+- It tracks daily water flows in Oregon by site
+- Shows flow data for February 6th and 7th
+- The flow data has daily mean flow, river location, and difference in daily flow 
+
+## First we do a plot
+
+```{r}
+plot(cleaned_data)
+
+
+```
+
+
+
+## Plot 1
+```{r}
+ggplot(data = cleaned_data, aes(x = flow_feb6)) +
+  geom_histogram(binwidth = 25, fill = "skyblue", color = "black") +
+  labs(title = "Histogram of Flow Data", x = "Flow Feb6", y = "Frequency") 
+
+```
+
+## Plot 2
+```{r}
+ggplot(data = cleaned_data, aes(x = flow_feb7)) +
+  geom_histogram(binwidth = 25, fill = "skyblue", color = "black") +
+  labs(title = "Histogram of Flow Data", x = "Flow Feb6", y = "Frequency")
+```
+
+## Plot 3
+```{r}
+ggplot(data = cleaned_data, aes(x = Difference))+
+  geom_histogram(binwidth = 5, fill = "skyblue", color = "black") +
+  labs(title = "Histogram of Flow Data", x = "Flow Variance", y = "Frequency")
+
+```
+
+## Data Manipulation: Logs!
+
+```{r}
+
+log <- cleaned_data %>%
+  mutate(log_sixth =log(flow_feb6, 10)) %>%
+  mutate(log_seventh = log(flow_feb7, 10)) %>%
+  mutate(dif = log(Difference, 10))
+
+
+```
+
+## Plot 4
+
+```{r}
+
+
+ggplot(data = log, aes(x = log_sixth)) +
+  geom_histogram(binwidth = .25, fill = "skyblue", color = "black") +
+  labs(title = "Histogram of Flow Data", x = "Flow Feb6", y = "Frequency")
+
+```
+
+## Plot 5
+
+```{r}
+
+ggplot(data = log, aes(x = log_seventh)) +
+  geom_histogram(binwidth = .25, fill = "skyblue", color = "black") +
+  labs(title = "Histogram of Flow Data", x = "Flow Feb6", y = "Frequency")
+```
+
+## Plot 6
+
+```{r}
+
+
+ggplot(data = log, aes(x = dif))+
+  geom_histogram(binwidth = .25, fill = "skyblue", color = "black") +
+  labs(title = "Histogram of Flow Data", x = "Flow Feb6", y = "Frequency")
+
+```
+
+## Shapiro Test for the fun of it
+
+```{r cars, echo = TRUE}
+
+shapiro.test(log$flow_feb6)
+
+shapiro.test(log$flow_feb7)
+
+```
+
+## Shapiro test pt. 2
+```{r, echo = TRUE}
+shapiro.test(log$Difference)
+
+shapiro.test(log$log_sixth)
+```
+
+## Shapiro test pt. 3
+``` {r, echo = TRUE}
+shapiro.test(log$log_seventh)
+
+shapiro.test(log$dif)
+```
+
+## Discussing this data
+
+- The data is not normally distributed so parametric tests not possible. 
+- The data is heavily skewed.
+- More transformations and statistical analysis is necessary.
+- Wasn't any obvious differences in histogram spread of data. 
+
+
+
+
